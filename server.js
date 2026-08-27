@@ -6,39 +6,97 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '15mb' }));
 
-// TWO-WAY FRONTEND DRAWING CANVAS
+// TWO-WAY FRONTEND DRAWING CANVAS (FAIRY BLOSSOM THEME)
 app.get('/', (req, res) => {
-    // URL Query check: dictates who is drawing (defaults to User A if left blank)
     const activeUser = req.query.user === 'B' ? 'B' : 'A';
-    const targetRecipient = activeUser === 'A' ? 'Person B\'s Home across the river' : 'Person A\'s Home across the river';
 
     res.send(`
 <!DOCTYPE html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Hudson River Canvas - User ${activeUser}</title>
+    <title>Enchanted Art Canvas</title>
     <style>
-        body { text-align: center; font-family: -apple-system, sans-serif; background: #141414; color: #fff; margin: 0; padding: 10px; }
-        h2 { margin: 5px 0 2px 0; font-weight: 400; font-size: 22px; color: #e0e0e0; }
-        .sub-header { color: #888; font-size: 13px; margin-bottom: 12px; }
-        canvas { border: 3px solid #333; background: #ffffff; touch-action: none; cursor: crosshair; box-shadow: 0px 10px 30px rgba(0,0,0,0.6); border-radius: 6px; max-width: 95vw; }
-        .control-box { margin-top: 15px; display: flex; justify-content: center; gap: 15px; }
-        button { padding: 15px 30px; font-size: 16px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: transform 0.1s; }
-        button:active { transform: scale(0.95); }
-        .clear-btn { background: #e74c3c; color: white; }
-        .send-btn { background: #2ecc71; color: white; }
+        body { 
+            text-align: center; 
+            font-family: "Georgia", serif; 
+            background-color: #1c1424; 
+            color: #f7ebd3; 
+            margin: 0; 
+            padding: 15px;
+            background-image: radial-gradient(rgba(223, 183, 108, 0.08) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        h2 { 
+            margin: 15px 0 5px 0; 
+            font-weight: normal; 
+            font-size: 26px; 
+            letter-spacing: 1px;
+            color: #f3c1dc;
+            text-shadow: 0px 2px 10px rgba(243, 193, 220, 0.3);
+        }
+        .sub-header { 
+            color: #bfa5cc; 
+            font-size: 14px; 
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        canvas { 
+            border: 6px double #dfb76c; 
+            background: #ffffff; 
+            touch-action: none; 
+            cursor: crosshair; 
+            box-shadow: 0px 15px 35px rgba(0,0,0,0.6), 0px 0px 15px rgba(223, 183, 108, 0.2); 
+            border-radius: 8px; 
+            max-width: 95vw; 
+        }
+        .control-box { 
+            margin-top: 20px; 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; 
+        }
+        button { 
+            padding: 14px 32px; 
+            font-size: 15px; 
+            font-family: "Georgia", serif;
+            border-radius: 25px; 
+            border: 1px solid rgba(223, 183, 108, 0.4); 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.2s ease; 
+        }
+        button:active { 
+            transform: scale(0.95); 
+        }
+        .clear-btn { 
+            background: #463352; 
+            color: #dfb76c; 
+        }
+        .clear-btn:hover {
+            background: #563f64;
+            border-color: #dfb76c;
+        }
+        .send-btn { 
+            background: #e2849e; 
+            color: #fff; 
+        }
+        .send-btn:hover {
+            background: #ea9cb2;
+            box-shadow: 0px 5px 20px rgba(226, 132, 158, 0.5);
+        }
     </style>
 </head>
 <body>
-    <h2>You are Artist ${activeUser}</h2>
-    <div class="sub-header">Sending drawings directly to ${targetRecipient}</div>
+    <h2>🌸 Pixie Canvas ${activeUser} 🌸</h2>
+    <div class="sub-header">Whisper a drawing through the air...</div>
     
     <canvas id="canvas" width="480" height="320"></canvas>
     
     <div class="control-box">
-        <button class="clear-btn" onclick="clearCanvas()">Clear</button>
-        <button class="send-btn" onclick="sendDrawing()">Send to Frame</button>
+        <button class="clear-btn" onclick="clearCanvas()">Erase</button>
+        <button class="send-btn" onclick="sendDrawing()">Send Magic</button>
     </div>
 
     <script>
@@ -49,7 +107,7 @@ app.get('/', (req, res) => {
 
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = "#000000";
+        ctx.strokeStyle = "#463352"; // Delicate deep berry-purple ink line
         ctx.lineWidth = 4;
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
@@ -96,8 +154,8 @@ app.get('/', (req, res) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user: currentUser, data: dataUrl })
             })
-            .then(res => { if(res.ok) alert("✨ Sent across the Hudson!"); })
-            .catch(err => alert("Error transmitting sketch: " + err));
+            .then(res => { if(res.ok) alert("✨ Your sketch has vanished into the air and landed in the frame!"); })
+            .catch(err => alert("Magical link error: " + err));
         }
     </script>
 </body>
@@ -105,24 +163,21 @@ app.get('/', (req, res) => {
     `);
 });
 
-// TWO-WAY INBOUND PROCESSING API
+// TWO-WAY DATA ROUTING API
 app.post('/upload', (req, res) => {
-    const sender = req.body.user; // Who drew the photo? ('A' or 'B')
-    if (!req.body.data || !sender) return res.status(400).send("Invalid packet payload.");
+    const sender = req.body.user;
+    if (!req.body.data || !sender) return res.status(400).send("Invalid packet.");
     
-    // Cross-routing logic: If A drew it, save it as B's display target file
     const targetFilename = (sender === 'A') ? "frame_B.jpg" : "frame_A.jpg";
     const base64Image = req.body.data.replace(/^data:image\/jpeg;base64,/, "");
     
     fs.writeFile(path.join(__dirname, targetFilename), base64Image, 'base64', (err) => {
         if (err) return res.status(500).send(err);
-        console.log(`[SERVER] Saved sketch data targeted for display file: ${targetFilename}`);
         res.send("Successfully Transmitted.");
     });
 });
 
-// FRAMES DOWNLOAD DATA THROUGH THESE ROUTED PATHS
 app.get('/frame_A.jpg', (req, res) => { res.sendFile(path.join(__dirname, 'frame_A.jpg')); });
 app.get('/frame_B.jpg', (req, res) => { res.sendFile(path.join(__dirname, 'frame_B.jpg')); });
 
-app.listen(PORT, () => console.log(`[SERVER] Cross-River System routing active on Port ${PORT}`));
+app.listen(PORT, () => console.log(`[SERVER] Magical routing system active on Port ${PORT}`));
